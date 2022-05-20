@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from "mongoose";
 import User from "../models/user.js";
 
 export const signin = async (req, res) => {
@@ -16,9 +17,10 @@ export const signin = async (req, res) => {
         if (!isPasswordCorrect) return res.status(404).json({ message: 'Password Incorrect ' + Math.floor((Math.random() * 10) + 1) });
 
         const token = jwt.sign({ email: existingUser.email, id: existingUser._id }, process.env.JWT, { expiresIn: '1d' });
-        res.status(200).json({ result: existingUser, token, message: "Signin Successful " + + Math.floor((Math.random() * 10) + 1) });
+
+        res.status(200).json({ result: existingUser, token, message: "Signin Successful " + Math.floor((Math.random() * 10) + 1) });
+
     } catch (err) {
-        console.log(err);
         res.status(500).json({ message: err.message })
     }
 }
@@ -55,5 +57,15 @@ export const signup = async (req, res) => {
         res.json({
             message: error.message
         })
+    }
+};
+
+export const singleUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const singleUser = await User.findById(id);
+        res.status(200).json(singleUser);
+    } catch (error) {
+        res.status(404).json({ message: error });
     }
 };
