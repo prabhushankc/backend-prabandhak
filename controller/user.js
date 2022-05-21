@@ -73,22 +73,22 @@ export const updateSingleUser = async (req, res) => {
     const { id } = req.params;
     const { email, firstName, number, lastName, role, selectedFile, address } = req.body;
     try {
-        const existingUser = await User.findById(id);
-        if (!existingUser) return res.status(404).json({ message: 'User not found ' + Math.floor((Math.random() * 10) + 1) });
-        if (firstName.length < 3 || firstName.length > 10) return res.status(404).json({ message: 'Firstname must be between 3 and 10 characters ' + Math.floor((Math.random() * 10) + 1) });
+        const existingUser = await User.findById(id)
+        if (!existingUser) return res.status(404).json({ message: 'User not found ' + Math.floor((Math.random() * 10) + 1) })
+        if (firstName.length < 3 || firstName.length > 10) return res.status(404).json({ message: 'Firstname must be between 3 and 10 characters ' + Math.floor((Math.random() * 10) + 1) })
 
-        if (lastName.length < 3 || lastName.length > 10) return res.status(404).json({ message: 'Lastname must be between 3 and 10 characters ' + Math.floor((Math.random() * 10) + 1) });
+        if (lastName.length < 3 || lastName.length > 10) return res.status(404).json({ message: 'Lastname must be between 3 and 10 characters ' + Math.floor((Math.random() * 10) + 1) })
         // phone number validation
-        if (number.length < 10 || number.length > 10) return res.status(404).json({ message: 'Phone number must be 10 digits ' + Math.floor((Math.random() * 10) + 1) });
+        if (number.length < 10 || number.length > 10) return res.status(404).json({ message: 'Phone number must be 10 digits ' + Math.floor((Math.random() * 10) + 1) })
         // address validation
-        if (address.length < 3 || address.length > 10) return res.status(404).json({ message: 'Address must be between 3 and 10 characters ' + Math.floor((Math.random() * 10) + 1) });
+        if (address.length < 3 || address.length > 10) return res.status(404).json({ message: 'Address must be between 3 and 10 characters ' + Math.floor((Math.random() * 10) + 1) })
         // selectedFile validation
-        if (selectedFile === null) return res.status(404).json({ message: 'SelectedFile is Required ' + Math.floor((Math.random() * 10) + 1) });
+        if (selectedFile === null) return res.status(404).json({ message: 'SelectedFile is Required ' + Math.floor((Math.random() * 10) + 1) })
 
-        const result = await User.findByIdAndUpdate(id, { email, number, name: `${firstName} ${lastName}`, role, selectedFile, number, address }, { new: true });
-        res.status(200).json({ result, message: "User Updated " + Math.floor((Math.random() * 10) + 1) });
+        const result = await User.findByIdAndUpdate(id, { email, number, name: `${firstName} ${lastName}`, role, selectedFile, number, address }, { new: true })
+        res.status(200).json({ result, message: "User Updated " + Math.floor((Math.random() * 10) + 1) })
 
     } catch (error) {
-        res.status(404).json({ message: error });
+        res.status(404).json({ message: error })
     }
 };
