@@ -6,7 +6,7 @@ const homePageSchema = mongoose.Schema({
     detail: {
         type: String
     },
-    details: {
+    description: {
         type: String
     },
     createdAt: {
