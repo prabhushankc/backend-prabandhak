@@ -5,6 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import userRoutes from './routes/users.js'
+import homePageRoutes from './routes/homePage.js'
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(bodyParser.json(
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
 app.use(cors());
 app.use('/user', userRoutes)
+app.use('/homePage', homePageRoutes)
 app.get('/', (req, res) => {
   res.send('Hello this is HMS')
 })
