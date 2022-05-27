@@ -1,13 +1,40 @@
-import jwt from 'jsonwebtoken'
-const auth = async (req, res, next) => {
+import jwt from "jsonwebtoken";
+import asyncHandler from "express-async-handler";
+
+const auth = asyncHandler(async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
     try {
-        const token = req.headers.authorization.split(" ")[1];
-        let decodedData;
-        decodedData = jwt.verify(token, process.env.JWT)
-        req.userId = decodedData?.id;
-        next();
+      token = req.headers.authorization.split(" ")[1];
+
+      const decodedData = jwt.verify(token, process.env.JWT);
+
+      // Get user from the token
+      req.userId = decodedData?.id;
+      next();
     } catch (error) {
-        console.log(error.message);
+      console.error(error);
+      res.status(401);
+      throw new Error("Not Authorized");
     }
-}
-export default auth;
+  }
+
+  if (!token) {
+    res.status(401);
+    throw new Error("Not Authorized, no token");
+  }
+});
+
+const isAdmin = (req, res, next) => {
+  if (req.user && req.user.isAdmin === 1) {
+    next();
+  } else {
+    res.status(401);
+    throw new Error("Not authorized as an admin");
+  }
+};
+
+export { auth, isAdmin };
