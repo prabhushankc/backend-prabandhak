@@ -5,10 +5,13 @@ import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 
+
 import userRoutes from "./routes/users.js";
 import roomRoutes from "./routes/roomRoute.js";
 
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import userRoutes from './routes/users.js'
+import homePageRoutes from './routes/homePage.js'
 
 const app = express();
 
@@ -28,6 +31,11 @@ if (process.env.NODE_ENV === "development") {
 // Setting up own error middleware
 app.use(notFound);
 app.use(errorHandler);
+app.use('/user', userRoutes)
+app.use('/homePage', homePageRoutes)
+app.get('/', (req, res) => {
+  res.send('Hello this is HMS')
+})
 
 const PORT = process.env.PORT || 5000;
 
