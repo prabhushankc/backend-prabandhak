@@ -10,6 +10,7 @@ export const deleteUsers = async (req, res) => {
     res.json({ msg: 'Users Deleted' });
 }
 export const signin = async (req, res) => {
+
     const { email, password } = req.body;
     try {
         // finding exisiting old user

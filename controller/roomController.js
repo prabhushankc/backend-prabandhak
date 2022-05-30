@@ -22,12 +22,12 @@ const createRoom = asyncHandler(async (req, res) => {
     capacity,
     condition,
     noofbeds,
-    // image,
+    image,
   } = req.body;
 
-  const room = await Room.create({
+  const room = new Room({
     title,
-    image: "/images/roomFirst.jpg",
+    image,
     user: req.userId,
     details,
     standard,
@@ -36,6 +36,8 @@ const createRoom = asyncHandler(async (req, res) => {
     condition,
     noofbeds,
   });
+
+  await room.save();
 
   res.status(201).json(room);
 });
