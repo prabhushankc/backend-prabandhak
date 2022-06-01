@@ -3,19 +3,11 @@ import jwt from 'jsonwebtoken';
 import mongoose from "mongoose";
 import User from "../models/user.js";
 
-export const deleteUsers = async (req, res) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
-    await User.findByIdAndRemove(id);
-    res.json({ msg: 'Users Deleted' });
-}
 export const signin = async (req, res) => {
-
     const { email, password } = req.body;
     try {
         // finding exisiting old user
         const existingUser = await User.findOne({ email });
-
         if (!existingUser)
             return res.status(404).json({ message: 'User not found' });
 
@@ -23,10 +15,12 @@ export const signin = async (req, res) => {
 
         if (!isPasswordCorrect) return res.status(404).json({ message: 'Password Incorrect' });
 
-        const token = jwt.sign({ email: existingUser.email, id: existingUser._id }, process.env.JWT, { expiresIn: '1d' });
-
-        res.status(200).json({ result: existingUser, token, message: "Signin Successful" });
-
+        const token = jwt.sign({ email: existingUser.email, id: existingUser._id, role: existingUser.role }, process.env.JWT, { expiresIn: '1d' });
+        if (existingUser.role === 1) {
+            res.status(200).json({ result: existingUser, token, message: `Welcome Admin, ${existingUser.name.split(" ")[0]}` });
+        } else {
+            res.status(200).json({ result: existingUser, token, message: `Welcome Back!, ${existingUser.name.split(" ")[0]}` });
+        }
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
