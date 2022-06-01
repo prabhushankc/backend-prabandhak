@@ -86,3 +86,14 @@ export const updateFoodPage = async (req, res) => {
     }
 
 }
+export const deleteFood = async (req, res) => {
+    const { id } = req.params;
+    try {
+        if (!id) return res.status(404).json({ message: 'Food not found' });
+        const result = await foodPage.findByIdAndRemove(id);
+        res.status(200).json({ result, message: "Food Deleted" });
+    }
+    catch (error) {
+        res.status(500).json({ message: error });
+    }
+}
