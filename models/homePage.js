@@ -9,11 +9,10 @@ const homePageSchema = mongoose.Schema({
     description: {
         type: String
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+},
+    {
+        timestamps: true
+    });
 
 const HomePage = mongoose.model('HomePage', homePageSchema);
 
