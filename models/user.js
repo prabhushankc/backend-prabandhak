@@ -14,7 +14,14 @@ const userSchema = mongoose.Schema({
     role: { type: Number, default: 0 },
     number: { type: String },
     address: { type: String },
-});
+    cart: {
+        type: Array,
+        default: []
+    }
+},
+    {
+        timestamps: true
+    });
 
 const userDetail = mongoose.model('UserDetails', userSchema);
 

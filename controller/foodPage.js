@@ -48,7 +48,6 @@ export const createFoodPage = async (req, res) => {
         });
     }
 }
-
 export const updateFoodPage = async (req, res) => {
     const { id } = req.params;
     const { title, description, selectedFile, price, tags, quantity } = req.body;
