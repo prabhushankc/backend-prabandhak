@@ -3,6 +3,12 @@ import jwt from 'jsonwebtoken';
 import mongoose from "mongoose";
 import User from "../models/user.js";
 
+export const deleteUsers = async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
+    await User.findByIdAndRemove(id);
+    res.json({ msg: 'Users Deleted' });
+}
 export const signin = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -17,9 +23,9 @@ export const signin = async (req, res) => {
 
         const token = jwt.sign({ email: existingUser.email, id: existingUser._id, role: existingUser.role }, process.env.JWT, { expiresIn: '1d' });
         if (existingUser.role === 1) {
-            res.status(200).json({ result: existingUser, token, message: `Welcome Admin, ${existingUser.name.split(" ")[0]}` });
+            res.status(200).json({ result: { role: existingUser.role, _id: existingUser._id }, token, message: `Welcome Admin, ${existingUser.name.split(" ")[0]}` });
         } else {
-            res.status(200).json({ result: existingUser, token, message: `Welcome Back!, ${existingUser.name.split(" ")[0]}` });
+            res.status(200).json({ result: { role: existingUser.role, _id: existingUser._id }, token, message: `Welcome Back!, ${existingUser.name.split(" ")[0]}` });
         }
     } catch (err) {
         res.status(500).json({ message: err.message })
@@ -53,7 +59,7 @@ export const signup = async (req, res) => {
         const result = await User.create({ email, password: hashPassword, number, name: `${firstName} ${lastName}`, role, selectedFile, number, address });
 
         const token = jwt.sign({ email: result.email, id: result._id }, process.env.JWT, { expiresIn: '1d' });
-        res.status(200).json({ result, token, message: "Account Created Successfully" });
+        res.status(200).json({ token, message: "Account Created Successfully" });
     } catch (error) {
         res.json({
             message: error.message
@@ -89,7 +95,7 @@ export const updateSingleUser = async (req, res) => {
         if (selectedFile === null) return res.status(404).json({ message: 'SelectedFile is Required' });
 
         const result = await User.findByIdAndUpdate(id, { email, number, name: `${firstName} ${lastName}`, role, selectedFile, number, address }, { new: true });
-        res.status(200).json({ result, message: "User Updated" });
+        res.status(200).json({ result: { role, _id }, message: "User Updated" });
 
     } catch (error) {
         res.json({ message: error });
@@ -105,5 +111,20 @@ export const deleteUser = async (req, res) => {
     }
     catch (error) {
         res.status(500).json({ message: error });
+    }
+}
+
+export const addCart = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId)
+        if (!user) return res.status(400).json({ message: "User does not exist." })
+
+        await User.findOneAndUpdate({ _id: req.userId }, {
+            cart: req.body
+        })
+
+        return res.json({ message: "Added to cart" })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
     }
 }

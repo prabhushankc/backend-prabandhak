@@ -15,6 +15,10 @@ const foodPageSchema = mongoose.Schema({
     quantity: {
         type: String
     },
+    sold: {
+        type: Number,
+        default: 0
+    },
 },
     {
         timestamps: true
