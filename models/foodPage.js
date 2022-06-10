@@ -13,7 +13,8 @@ const foodPageSchema = mongoose.Schema({
         type: [String]
     },
     quantity: {
-        type: String
+        type: Number,
+        default: 0
     },
     sold: {
         type: Number,
