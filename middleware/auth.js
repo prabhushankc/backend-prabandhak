@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
+import userDetail from "../models/user.js";
 
 const auth = asyncHandler(async (req, res, next) => {
   let token;
@@ -14,6 +15,7 @@ const auth = asyncHandler(async (req, res, next) => {
 
       // Get user from the token
       req.userId = decodedData?.id;
+      req.user = await userDetail.findById(decodedData.id, "-password");
       next();
     } catch (error) {
       console.error(error);
@@ -29,7 +31,7 @@ const auth = asyncHandler(async (req, res, next) => {
 });
 
 const isAdmin = (req, res, next) => {
-  if (req.user && req.user.isAdmin === 1) {
+  if (req.user && req.user.role) {
     next();
   } else {
     res.status(401);
