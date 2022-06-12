@@ -97,4 +97,19 @@ const updateRoom = asyncHandler(async (req, res) => {
   res.status(201).json(updatedRoom);
 });
 
+const deleteRoom = asyncHandler(async (req, res) => {
+  const room = await Room.findById(req.params.id);
+
+  if (!room) {
+    throw new Error("Room not found");
+    res.status(404);
+    return;
+  }
+
+  await room.remove();
+
+  res.json({ message: "Room Deleted" });
+});
+
 export { createRoom, getRooms, getRoomById, updateRoom };
+
