@@ -1,13 +1,31 @@
 import foodPage from "../models/foodpage.js";
 
 export const getFoodPage = async (req, res) => {
+    const { page, limit, sort } = req.query;
     try {
-        const foodPageData = await foodPage.find();
-        res.status(200).json({ foodPageData, message: "Welcome to Prabandhak" });
+        const PAGE = page || 1;
+        const LIMIT = limit || 4;
+        const SKIP = (Number(PAGE) - 1) * LIMIT; // get the starting index of every page
+        const SORT = sort || 'createdAt';
+        const TotalPages = await foodPage.countDocuments({});
+        const foodPageData = await foodPage.find().sort(SORT).limit(LIMIT).skip(SKIP);
+        res.json({ foodPageData, currentPage: Number(PAGE), totalFoodPage: Math.ceil(TotalPages / LIMIT) });
     } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        console.log(error);
+        res.status(404).json({ message: error });
+    }
+};
+
+export const getFoodBySearch = async (req, res) => {
+    const { searchFood, tags } = req.query;
+    try {
+        const title = new RegExp(searchFood, 'i');
+        // const tag = new RegExp(tags, 'i');
+        // const foodSearchData = await foodPage.find({ $or: [{ title }, { tags: { $in: tag.split(',') } }] });
+        const foodSearchData = await foodPage.find({ $or: [{ title }] });
+        res.json({ foodSearchData, message: foodSearchData.length + " food found for " + '"' + searchFood + '"' });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 }
 
