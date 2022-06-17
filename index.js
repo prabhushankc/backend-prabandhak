@@ -22,7 +22,7 @@ app.use(cors());
 app.use("/user", userRoutes);
 app.use("/homepage", homePageRoutes);
 app.use("/api/rooms", roomRoutes);
-app.use("/api/book/room", roomBookRoute);
+app.use("/api/booked/rooms", roomBookRoute);
 app.use("/api/contact/us", contactUs);
 
 // Using morgan for dev dependancy

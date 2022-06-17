@@ -3,7 +3,7 @@ import RoomBook from "../models/roomBookModel.js";
 import Room from "../models/roomModel.js";
 
 // @description   Book a room
-// @route         POST /api/book/room
+// @route         POST /api/booked/rooms
 // @access        Private
 const addBookRooms = asyncHandler(async (req, res) => {
   const { name, email, phnumber, noofguests, bookingDate, noofdays } = req.body;
@@ -33,7 +33,7 @@ const addBookRooms = asyncHandler(async (req, res) => {
 });
 
 // @description   Get all booked rooms
-// @route         GET /api/book/room
+// @route         GET /api/booked/rooms
 // @access        Private/Admin
 const getBookedRooms = asyncHandler(async (req, res) => {
   const roomData = await RoomBook.find({});
@@ -41,4 +41,23 @@ const getBookedRooms = asyncHandler(async (req, res) => {
   res.json(roomData);
 });
 
-export { addBookRooms, getBookedRooms };
+// @description   Get my booked rooms
+// @route         GET /api/booked/rooms/me
+// @access        Private/
+const getMyBookedRooms = asyncHandler(async (req, res) => {
+  const roomData = await RoomBook.find({ user: req.userId }).populate({
+    path: "room",
+    select: ["image", "standard", "price"],
+    strictPopulate: false,
+  });
+
+  if (!roomData) {
+    res.status(404);
+    throw new Error("No Booked Rooms");
+    return;
+  }
+
+  res.json(roomData);
+});
+
+export { addBookRooms, getBookedRooms, getMyBookedRooms };
