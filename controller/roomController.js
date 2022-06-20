@@ -21,11 +21,21 @@ const getRoomById = asyncHandler(async (req, res) => {
 });
 
 // @description   Fetch all Rooms
-// @route         GET /api/rooms
+// @route         GET /api/rooms?keyword=""
 // @access        Admin/Private
 const getRooms = asyncHandler(async (req, res) => {
-  const rooms = await Room.find({});
+  const keyword = req.query.keyword
+    ? {
+        title: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : {};
+  const { sort } = req.query;
+  const SORT = sort || "createdAt";
 
+  const rooms = await Room.find({ ...keyword }).sort(SORT);
   res.json(rooms);
 });
 
