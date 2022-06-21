@@ -11,6 +11,30 @@ export const getPayments = async (req, res) => {
         return res.status(500).json({ message: err.message })
     }
 };
+export const getPaymentClient = async (req, res) => {
+    try {
+        // check user_id by id
+        const user = await Users.findById(req.userId);
+        if (!user) return res.status(400).json({ message: "User does not exist." })
+        // check payment_id by user_id
+        const payment = await paymentPage.find({ user_id: req.userId });
+        res.json({ payment, message: "Payment History" })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
+    }
+}
+export const deletePaymentByUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const payment = await paymentPage.findById(id);
+        if (!payment) return res.status(400).json({ message: "Payment does not exist." })
+        if (payment.user_id !== req.userId) return res.status(400).json({ message: "You are not authorized to delete this payment." })
+        await paymentPage.findByIdAndDelete(id);
+        res.json({ message: "Payment deleted successfully." })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
+    }
+}
 export const createPayment = async (req, res) => {
     try {
         const user = await Users.findById(req.userId).select('name email');
