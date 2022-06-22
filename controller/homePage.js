@@ -6,7 +6,7 @@ export const getHomePage = async (req, res) => {
     res.status(200).json({ homePage, message: "Welcome" });
   } catch (error) {
     res.status(400).json({
-      message: error,
+      message: error.message,
     });
   }
 };
@@ -38,5 +38,47 @@ export const createHomePage = async (req, res) => {
     res.json({
       message: error.message,
     });
+  }
+};
+
+export const updateHomePage = async (req, res) => {
+  const { id } = req.params;
+  const { title, detail, selectedFile, description } = req.body;
+  try {
+    if (!title || !detail) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+      });
+    }
+    if (!description) {
+      return res.status(400).json({
+        message: "Please provide description",
+      });
+    }
+    if (!selectedFile) {
+      return res.status(400).json({
+        message: "Please provide a file",
+      });
+    }
+    const homePageUpdate = { title, detail, selectedFile, description };
+    const updateHomePage = await HomePage.findByIdAndUpdate(
+      id,
+      homePageUpdate,
+      { new: true }
+    );
+    res.json({ updateHomePage, message: "Product Updated Successfully" });
+  } catch (error) {
+    res.json({ message: error });
+  }
+};
+
+export const deleteHome = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!id) return res.status(404).json({ message: "home not found" });
+    const result = await HomePage.findByIdAndRemove(id);
+    res.status(200).json({ result, message: "Home Data Deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error });
   }
 };
