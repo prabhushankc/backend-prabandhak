@@ -1,18 +1,7 @@
-import jwt from "jsonwebtoken";
-import asyncHandler from "express-async-handler";
-import userDetail from "../models/user.js";
-
+import jwt from 'jsonwebtoken'
 
 const auth = async (req, res, next) => {
     try {
-      token = req.headers.authorization.split(" ")[1];
-
-      const decodedData = jwt.verify(token, process.env.JWT);
-
-      // Get user from the token
-      req.userId = decodedData?.id;
-      req.user = await userDetail.findById(decodedData.id, "-password");
-      next();
         if (!req.headers.authorization) {
             return res.status(440).json({ message: 'Unknown Request' })
         }
@@ -24,23 +13,6 @@ const auth = async (req, res, next) => {
     } catch (error) {
         res.status(440).json({ message: 'unauthorized Auth' })
     }
-  }
-
-  if (!token) {
-    res.status(401);
-    throw new Error("Not Authorized, no token");
-  }
-});
-
-const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role) {
-    next();
-  } else {
-    res.status(401);
-    throw new Error("Not authorized as an admin");
-  }
-};
-
 }
 const checkAdmin = async (req, res, next) => {
     try {
@@ -60,4 +32,4 @@ const checkAdmin = async (req, res, next) => {
         res.status(440).json({ message: error.message })
     }
 }
-export { auth, checkAdmin, isAdmin };
+export { auth, checkAdmin };
