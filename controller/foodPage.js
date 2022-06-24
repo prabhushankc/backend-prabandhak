@@ -1,29 +1,113 @@
 import foodPage from "../models/foodpage.js";
 
+
+// Filter, sorting and paginating
+
+class APIfeatures {
+    constructor(query, queryString) {
+        this.query = query;
+        this.queryString = queryString;
+    }
+    filtering() {
+        const queryObj = { ...this.queryString } //queryString = req.query
+        const excludedFields = ['page', 'sort', 'limit']
+        excludedFields.forEach(el => delete (queryObj[el]))
+        let queryStr = JSON.stringify(queryObj)
+        queryStr = queryStr.replace(/\b(gte|gt|lt|lte|regex)\b/g, match => '$' + match)
+        this.query.find(JSON.parse(queryStr))
+        return this;
+    }
+
+    titleFiltering() {
+        const queryObj = { ...this.queryString } //queryString = req.query
+
+        const excludedFields = ['page', 'sort', 'limit', 'tags']
+        excludedFields.forEach(el => delete (queryObj[el]))
+        let queryStr = JSON.stringify(queryObj)
+        queryStr = queryStr.replace(/\b(gte|gt|lt|lte|regex)\b/g, match => '$' + match)
+        this.query.find(JSON.parse(queryStr))
+        return this;
+    }
+    tagsFiltering() {
+        const queryObj = { ...this.queryString } //queryString = req.query
+
+        const excludedFields = ['page', 'sort', 'limit', 'title']
+        excludedFields.forEach(el => delete (queryObj[el]))
+
+        let queryStr = JSON.stringify(queryObj)
+        queryStr = queryStr.replace(/\b(gte|gt|lt|lte|regex)\b/g, match => '$' + match)
+        this.query.find(JSON.parse(queryStr))
+        return this;
+    }
+    sorting() {
+        if (this.queryString.sort) {
+            const sortBy = this.queryString.sort
+            this.query = this.query.sort(sortBy)
+        } else {
+            this.query = this.query.sort('-createdAt')
+        }
+
+        return this;
+    }
+
+    paginating() {
+        const page = this.queryString.page * 1 || 1
+        const limit = this.queryString.limit * 1 || 4
+        const skip = (page - 1) * limit;
+        this.query = this.query.skip(skip).limit(limit)
+        return this;
+    }
+}
+
 export const getFoodPage = async (req, res) => {
-    const { page, limit, sort } = req.query;
     try {
-        const PAGE = page || 1;
-        const LIMIT = limit || 4;
-        const SKIP = (Number(PAGE) - 1) * LIMIT; // get the starting index of every page
-        const SORT = sort || 'createdAt';
-        const TotalPages = await foodPage.countDocuments({});
-        const foodPageData = await foodPage.find().sort(SORT).limit(LIMIT).skip(SKIP);
-        res.json({ foodPageData, currentPage: Number(PAGE), totalFoodPage: Math.ceil(TotalPages / LIMIT) });
-    } catch (error) {
+        const TotalPages = await foodPage.countDocuments({})
+        const LIMIT = 4;
+        const PAGE = req.query.page;
+        const startIndex = (Number(PAGE) - 1) * LIMIT;
+        const SORT = req.query.sort || '-sold';
+        if (req.query.tags !== 'none' && req.query.title.regex !== 'none') {
+            const features = new APIfeatures(foodPage.find(), req.query)
+                .filtering().sorting().paginating()
+            const foodPageData = await features.query
+            res.json({ foodPageData, currentPage: Number(PAGE), totalFoodPage: Math.ceil(TotalPages / LIMIT) });
+        } else if (req.query.tags === 'none' && req.query.title.regex === 'none') {
+            const foodPageData = await foodPage.find().sort(SORT).limit(LIMIT).skip(startIndex);
+            res.json({ foodPageData, currentPage: Number(PAGE), totalFoodPage: Math.ceil(TotalPages / LIMIT) });
+            console.log('byee');
+        } else if (req.query.tags === 'none' && req.query.title.regex !== 'none') {
+            const features = new APIfeatures(foodPage.find(), req.query)
+                .titleFiltering().sorting().paginating()
+            const foodPageData = await features.query
+            res.json({ foodPageData, currentPage: Number(PAGE), totalFoodPage: Math.ceil(TotalPages / LIMIT) });
+        } else if (req.query.title.regex === 'none' && req.query.tags !== "none") {
+            const features = new APIfeatures(foodPage.find(), req.query)
+                .tagsFiltering().sorting().paginating()
+            const foodPageData = await features.query
+            res.json({ foodPageData, currentPage: Number(PAGE), totalFoodPage: Math.ceil(TotalPages / LIMIT) });
+        }
+    }
+    catch (error) {
         console.log(error);
         res.status(404).json({ message: error });
     }
 };
 
 export const getFoodBySearch = async (req, res) => {
-    const { searchFood, tags } = req.query;
+    const { searchFood, tags: tag } = req.query;
     try {
         const title = new RegExp(searchFood, 'i');
-        // const tag = new RegExp(tags, 'i');
-        // const foodSearchData = await foodPage.find({ $or: [{ title }, { tags: { $in: tag.split(',') } }] });
-        const foodSearchData = await foodPage.find({ $or: [{ title }] });
-        res.json({ foodSearchData, message: foodSearchData.length + " food found for " + '"' + searchFood + '"' });
+        const tags = new RegExp(tag, 'i');
+        const foodSearchData = await foodPage.find({ $or: [{ title }, { tags }] });
+        if (searchFood !== 'none') {
+            res.json({ foodSearchData, message: foodSearchData.length + " food found for " + '"' + searchFood + '"' });
+        }
+        else {
+            res.json({
+                foodSearchData, message: foodSearchData.length + " item found for " + '"' + tag + '"'
+            })
+        }
+
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
