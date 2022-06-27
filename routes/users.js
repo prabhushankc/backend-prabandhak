@@ -9,6 +9,6 @@ router.get('/singleuser/:id', auth, singleUser)
 router.patch('/updatesingleuser/:id', auth, updateSingleUser)
 router.delete('/deleteuser/:id', auth, deleteUser)
 router.patch('/addcart', auth, addCart)
-router.patch('/increment/:id', auth, incrementCart)
 router.patch('/dltcart/:id', auth, deleteaCart)
+router.patch('/increment/:id', auth, incrementCart)
 export default router;

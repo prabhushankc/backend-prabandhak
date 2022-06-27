@@ -177,22 +177,7 @@ export const addCart = async (req, res) => {
     }
 };
 
-export const deleteaCart = async (req, res) => {
-    const { id } = req.params;
-    const cart = req.body;
-    try {
-        const user = await User.findById(req.userId)
-        if (!user) return res.status(400).json({ message: "User does not exist." })
-        const newCart = cart.filter(item => item._id !== id)
-        await User.findOneAndUpdate({ _id: req.userId }, {
-            cart: newCart
-        })
-        res.status(200).json({ message: "Item Removed" })
-    }
-    catch (err) {
-        return res.status(500).json({ message: err.message })
-    }
-}
+
 
 export const incrementCart = async (req, res) => {
     try {
@@ -222,5 +207,22 @@ export const incrementCart = async (req, res) => {
         }
     } catch (err) {
         return res.status(500).json({ message: err.message })
+    }
+}
+
+export const deleteaCart = async (req, res) => {
+    const { id } = req.params;
+    const cart = req.body;
+    try {
+        const user = await User.findById(req.userId)
+        if (!user) return res.status(400).json({ message: "User does not exist." })
+        const newCart = cart.filter(item => item._id !== id)
+        await User.findOneAndUpdate({ _id: req.userId }, {
+            cart: newCart
+        })
+        res.status(200).json({ message: "Item Removed Successfully" })
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }
