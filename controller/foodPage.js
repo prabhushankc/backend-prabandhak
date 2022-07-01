@@ -198,3 +198,43 @@ export const deleteFood = async (req, res) => {
         res.status(500).json({ message: error });
     }
 }
+export const createCommentFood = async (req, res) => {
+    const { id } = req.params;
+    const { formData, updated } = req.body;
+    try {
+        const status = updated ? 'updated' : 'created';
+        const food = await foodPage.findById(id);
+        if (!food) return res.status(404).json({ message: 'Food not found' });
+        if (status === 'updated') {
+            const userComment = food.comments.find(comment => comment.userId === formData.userId);
+            userComment.comments = formData.comments;
+            const updatedCommentFood = await foodPage.findByIdAndUpdate(id, { ...food, comments: userComment.comments }, { new: true });
+            res.json({ updatedCommentFood, message: "Comment Updated Successfully" });
+        }
+        else {
+            const userComment = food.comments.find(comment => comment.userId === formData.userId);
+            if (userComment) {
+                return res.status(400).json({ message: "You have already commented" });
+            }
+            food.comments.push(formData);
+            const updatedCommentFood = await foodPage.findByIdAndUpdate(id, food, { new: true });
+            res.json({ updatedCommentFood, message: "Comment Successfully" });
+        }
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+export const deleteCommentFood = async (req, res) => {
+    const { id, cmtuserId } = req.params;
+    try {
+        const food = await foodPage.findById(id);
+        if (!food) return res.status(404).json({ message: 'Food not found' });
+        const comment = food.comments.find(comment => comment.userId === cmtuserId);
+        if (!comment) return res.status(404).json({ message: 'Comment not found' });
+        food.comments.pull(comment);
+        const deletedCommentFood = await foodPage.findByIdAndUpdate(id, food, { new: true });
+        res.json({ deletedCommentFood, message: "Comment Deleted" });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
