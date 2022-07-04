@@ -27,6 +27,8 @@ const addBookRooms = asyncHandler(async (req, res) => {
     noofdays,
   });
 
+  bookedRoom.isBooked = true;
+
   bookedRoom.save();
 
   res.status(201).json(bookedRoom);
@@ -41,23 +43,94 @@ const getBookedRooms = asyncHandler(async (req, res) => {
   res.json(roomData);
 });
 
+// @description   Get booked rooms By Id
+// @route         GET /api/booked/rooms/:id
+// @access        Private
+const getBookedRoomById = asyncHandler(async (req, res) => {
+  const roomData = await RoomBook.findById(req.params.id).populate({
+    path: "room",
+    select: [
+      "image",
+      "title",
+      "price",
+      "capacity",
+      "noofbeds",
+      "rating",
+      "numReviews",
+    ],
+    strictPopulate: false,
+  });
+
+  if (!roomData) {
+    res.status(404);
+    throw new Error("No such booked rooms");
+  }
+
+  res.json(roomData);
+});
+
 // @description   Get my booked rooms
 // @route         GET /api/booked/rooms/me
 // @access        Private/
 const getMyBookedRooms = asyncHandler(async (req, res) => {
   const roomData = await RoomBook.find({ user: req.userId }).populate({
     path: "room",
-    select: ["image", "standard", "price"],
+    select: ["image", "standard", "price", "rating"],
     strictPopulate: false,
   });
 
   if (!roomData) {
     res.status(404);
     throw new Error("No Booked Rooms");
-    return;
   }
 
   res.json(roomData);
 });
 
-export { addBookRooms, getBookedRooms, getMyBookedRooms };
+// @description   Update Room Approval
+// @route         PUT /api/booked/rooms/:id/approve
+// @access        Admin/Private
+const updateRoomApproval = asyncHandler(async (req, res) => {
+  const roomData = await RoomBook.findById(req.params.id);
+
+  if (!roomData) {
+    res.status(404);
+    throw new Error("No such booked rooms");
+  }
+
+  if (roomData.isApproved) {
+    roomData.isApproved = false;
+  } else {
+    roomData.isApproved = true;
+  }
+
+  const updatedRoom = await roomData.save();
+
+  res.json(updatedRoom);
+});
+
+// @description   Delete my booked rooms
+// @route         DELETE /api/booked/rooms/:id
+// @access        Private/Admin & Private
+const deleteBookedRooms = asyncHandler(async (req, res) => {
+  const roomData = await RoomBook.findById(req.params.id);
+
+  if (!roomData) {
+    res.status(404);
+    throw new Error("No Such Booked Rooms");
+    return;
+  }
+
+  await roomData.remove();
+
+  res.json({ message: "Booked Room Deleted" });
+});
+
+export {
+  addBookRooms,
+  getBookedRooms,
+  getMyBookedRooms,
+  getBookedRoomById,
+  deleteBookedRooms,
+  updateRoomApproval,
+};
