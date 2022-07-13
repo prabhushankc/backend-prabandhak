@@ -38,6 +38,11 @@ const roomOrderSchema = mongoose.Schema({
     required: true,
     default: false,
   },
+  isPaid: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 const RoomBook = mongoose.model("RoomBook", roomOrderSchema);

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import userDetail from "../models/user.js";
 
 const auth = async (req, res, next) => {
   try {
@@ -9,6 +10,7 @@ const auth = async (req, res, next) => {
     let decodedData;
     decodedData = jwt.verify(token, process.env.JWT);
     req.userId = decodedData?.id;
+    req.user = await userDetail.findById(decodedData.id, "-password");
     next();
   } catch (error) {
     res.status(440).json({ message: "unauthorized Auth" });

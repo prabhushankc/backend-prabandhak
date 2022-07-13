@@ -114,14 +114,36 @@ const deleteRoom = asyncHandler(async (req, res) => {
   const room = await Room.findById(req.params.id);
 
   if (!room) {
-    throw new Error("Room not found");
     res.status(404);
+    throw new Error("Room not found");
     return;
   }
 
   await room.remove();
 
   res.json({ message: "Room Deleted" });
+});
+
+// @description   Update Room Availability
+// @route         PUT /api/rooms/:id/available
+// @access        Admin/Private
+const updateRoomStatus = asyncHandler(async (req, res) => {
+  const room = await Room.findById(req.params.id);
+
+  if (!room) {
+    res.status(404);
+    throw new Error("Room not found");
+  }
+
+  if (room.isAvailable) {
+    room.isAvailable = false;
+  } else {
+    room.isAvailable = true;
+  }
+
+  await room.save();
+
+  res.json({ room });
 });
 
 // @description   Review Room
@@ -167,6 +189,36 @@ const createRoomReview = asyncHandler(async (req, res) => {
   res.status(201).json({ message: "Review added", room });
 });
 
+// @description   Review Room
+// @route         PUT /api/rooms/:room_id/:review_id/reply
+// @access        Private
+const replyRoomReview = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  const { reply } = req.body;
+  const room = await Room.findById(req.params.room_id);
+
+  const review = room.reviews.find(
+    review => review.id === req.params.review_id
+  );
+
+  if (!review) {
+    res.status(404);
+    throw new Error("Review not found");
+  }
+
+  const replyData = {
+    name: req.user.name,
+    reply,
+    user: req.userId,
+  };
+
+  review.replies.push(replyData);
+
+  await room.save();
+
+  res.json(review.replies);
+});
+
 // @description   Delete Room Review
 // @route         DELETE /api/rooms/:id/:review_id
 // @access        Private
@@ -205,5 +257,7 @@ export {
   updateRoom,
   deleteRoom,
   createRoomReview,
+  updateRoomStatus,
+  replyRoomReview,
   deleteRoomReview,
 };

@@ -2,16 +2,16 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
-import morgan from "morgan";
 import dotenv from "dotenv";
 import roomRoutes from "./routes/roomRoute.js";
 import roomBookRoute from "./routes/roomBookRoute.js";
 import contactUs from "./routes/contactRoute.js";
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import userRoutes from "./routes/users.js";
 import homePageRoutes from "./routes/homePage.js";
 import foodPageRoutes from "./routes/foodPage.js";
 import paymentRoutes from "./routes/payment.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import morgan from "morgan";
 
 const app = express();
 
@@ -19,13 +19,17 @@ dotenv.config();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
+app.use(morgan("dev"));
 app.use("/user", userRoutes);
-app.use("/homepage", homePageRoutes);
+app.use("/homePage", homePageRoutes);
+app.use("/foodPage", foodPageRoutes);
+app.use("/payment", paymentRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/booked/rooms", roomBookRoute);
 app.use("/api/contact/us", contactUs);
-app.use("/foodPage", foodPageRoutes);
-app.use("/payment", paymentRoutes);
+app.get("/", (req, res) => {
+  res.send("Hello this is HMS");
+});
 
 // Using morgan for dev dependancy
 if (process.env.NODE_ENV === "development") {

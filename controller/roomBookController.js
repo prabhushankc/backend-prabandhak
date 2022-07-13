@@ -38,7 +38,11 @@ const addBookRooms = asyncHandler(async (req, res) => {
 // @route         GET /api/booked/rooms
 // @access        Private/Admin
 const getBookedRooms = asyncHandler(async (req, res) => {
-  const roomData = await RoomBook.find({});
+  const roomData = await RoomBook.find({}).populate({
+    path: "room",
+    select: "title",
+    strictPopulate: false,
+  });
 
   res.json(roomData);
 });
@@ -98,15 +102,35 @@ const updateRoomApproval = asyncHandler(async (req, res) => {
     throw new Error("No such booked rooms");
   }
 
-  if (roomData.isApproved) {
-    roomData.isApproved = false;
-  } else {
-    roomData.isApproved = true;
-  }
+  // if (!roomData.isApproved) {
+  //   roomData.isApproved = true;
+  // } else {
+  //   roomData.isApproved = false;
+  // }
+
+  roomData.isApproved = !roomData.isApproved;
 
   const updatedRoom = await roomData.save();
 
   res.json(updatedRoom);
+});
+
+// @description   Update Room Approval
+// @route         PUT /api/booked/rooms/:id/payment
+// @access        Admin/Private
+const updateRoomPayment = asyncHandler(async (req, res) => {
+  const roomData = await RoomBook.findById(req.params.id);
+
+  if (!roomData) {
+    res.status(404);
+    throw new Error("No such booked rooms");
+  }
+
+  roomData.isPaid = true;
+
+  await roomData.save();
+
+  res.json(roomData);
 });
 
 // @description   Delete my booked rooms
@@ -133,4 +157,5 @@ export {
   getBookedRoomById,
   deleteBookedRooms,
   updateRoomApproval,
+  updateRoomPayment,
 };

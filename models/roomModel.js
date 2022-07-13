@@ -10,6 +10,17 @@ const reviewSchema = mongoose.Schema(
       required: true,
       ref: "UserDetails",
     },
+    replies: [
+      {
+        name: { type: String, required: true },
+        reply: { type: String, required: true },
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+          ref: "UserDetails",
+        },
+      },
+    ],
   },
   {
     timestamps: true,
