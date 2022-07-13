@@ -239,19 +239,10 @@ export const updateFoodPage = async (req, res) => {
     );
     res.json({ updateFoodPage, message: "Food Item Updated Successfully" });
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 };
-export const deleteFood = async (req, res) => {
-  const { id } = req.params;
-  try {
-    if (!id) return res.status(404).json({ message: "Food not found" });
-    const result = await foodPage.findByIdAndRemove(id);
-    res.status(200).json({ result, message: "Food Deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
-};
+
 export const createCommentFood = async (req, res) => {
   const { id } = req.params;
   const { formData, updated } = req.body;
@@ -301,5 +292,15 @@ export const deleteCommentFood = async (req, res) => {
     res.json({ deletedCommentFood, message: "Comment Deleted" });
   } catch (error) {
     res.status(404).json({ message: error.message });
+  }
+};
+export const deleteFood = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!id) return res.status(404).json({ message: "Food not found" });
+    const result = await foodPage.findByIdAndRemove(id);
+    res.status(200).json({ result, message: "Food Deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error });
   }
 };
