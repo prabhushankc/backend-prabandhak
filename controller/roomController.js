@@ -107,6 +107,9 @@ const updateRoom = asyncHandler(async (req, res) => {
   res.status(201).json(updatedRoom);
 });
 
+// @description   Delete Room
+// @route         Delete /api/rooms/:id
+// @access        Admin/Private
 const deleteRoom = asyncHandler(async (req, res) => {
   const room = await Room.findById(req.params.id);
 
@@ -121,5 +124,86 @@ const deleteRoom = asyncHandler(async (req, res) => {
   res.json({ message: "Room Deleted" });
 });
 
-export { createRoom, getRooms, getRoomById, updateRoom };
+// @description   Review Room
+// @route         PUT /api/rooms/:id/reviews
+// @access        Private
+const createRoomReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
 
+  const room = await Room.findById(req.params.id);
+
+  if (!room) {
+    res.status(404);
+    throw new Error("Room not found");
+    return;
+  }
+
+  const alreadyReviewed = room.reviews.find(
+    review => review.user.toString() === req.user._id.toString()
+  );
+
+  if (alreadyReviewed) {
+    res.status(400);
+    throw new Error("Room already reviewed");
+    return;
+  }
+
+  const review = {
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+    user: req.userId,
+  };
+
+  room.reviews.push(review);
+
+  room.numReviews = room.reviews.length;
+
+  room.rating =
+    room.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    room.reviews.length;
+
+  await room.save();
+  res.status(201).json({ message: "Review added", room });
+});
+
+// @description   Delete Room Review
+// @route         DELETE /api/rooms/:id/:review_id
+// @access        Private
+const deleteRoomReview = asyncHandler(async (req, res) => {
+  const room = await Room.findById(req.params.id);
+
+  const review = room.reviews.find(
+    review => review.id === req.params.review_id
+  );
+
+  if (!review) {
+    res.status(404);
+    throw new Error("No Review Found");
+    return;
+  }
+
+  if (review.user.toString() !== req.userId) {
+    res.status(401);
+    throw new Error("User not authorized");
+    return;
+  }
+
+  room.reviews = room.reviews.filter(
+    review => review.id !== req.params.review_id
+  );
+
+  await room.save();
+
+  res.json(room.reviews);
+});
+
+export {
+  createRoom,
+  getRooms,
+  getRoomById,
+  updateRoom,
+  deleteRoom,
+  createRoomReview,
+  deleteRoomReview,
+};

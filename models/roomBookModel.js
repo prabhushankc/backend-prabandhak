@@ -28,6 +28,16 @@ const roomOrderSchema = mongoose.Schema({
     required: [true, "Please enter number of days"],
     default: 1,
   },
+  isBooked: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  isApproved: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 const RoomBook = mongoose.model("RoomBook", roomOrderSchema);
