@@ -1,12 +1,12 @@
-import asyncHandler from "express-async-handler";
-import Room from "../models/roomModel.js";
+const asyncHandler = require("express-async-handler");
+const Room = require("../models/roomModel.js");
 
 // @description   Get Room By Id
 // @route         GET /api/rooms/:id
 // @access        Admin/Private
 const getRoomById = asyncHandler(async (req, res) => {
   const room = await Room.findById(req.params.id).populate({
-    path: "UserDetails",
+    path: "user",
     select: "name",
     strictPopulate: false,
   });
@@ -36,6 +36,7 @@ const getRooms = asyncHandler(async (req, res) => {
   const SORT = sort || "createdAt";
 
   const rooms = await Room.find({ ...keyword }).sort(SORT);
+
   res.json(rooms);
 });
 
@@ -157,7 +158,6 @@ const createRoomReview = asyncHandler(async (req, res) => {
   if (!room) {
     res.status(404);
     throw new Error("Room not found");
-    return;
   }
 
   const alreadyReviewed = room.reviews.find(
@@ -167,7 +167,6 @@ const createRoomReview = asyncHandler(async (req, res) => {
   if (alreadyReviewed) {
     res.status(400);
     throw new Error("Room already reviewed");
-    return;
   }
 
   const review = {
@@ -175,6 +174,7 @@ const createRoomReview = asyncHandler(async (req, res) => {
     rating: Number(rating),
     comment,
     user: req.userId,
+    image: req.user.selectedFile,
   };
 
   room.reviews.push(review);
@@ -250,7 +250,7 @@ const deleteRoomReview = asyncHandler(async (req, res) => {
   res.json(room.reviews);
 });
 
-export {
+module.exports = {
   createRoom,
   getRooms,
   getRoomById,

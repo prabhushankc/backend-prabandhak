@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const contactSchema = mongoose.Schema({
   user: {
@@ -21,6 +21,11 @@ const contactSchema = mongoose.Schema({
     type: String,
     required: [true, "Please enter your comment"],
   },
+  isResolved: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
   date: {
     type: Date,
     required: true,
@@ -30,4 +35,4 @@ const contactSchema = mongoose.Schema({
 
 const Contact = mongoose.model("ContactUs", contactSchema);
 
-export default Contact;
+module.exports = Contact;

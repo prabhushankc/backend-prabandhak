@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const roomOrderSchema = mongoose.Schema({
   user: {
@@ -47,4 +47,4 @@ const roomOrderSchema = mongoose.Schema({
 
 const RoomBook = mongoose.model("RoomBook", roomOrderSchema);
 
-export default RoomBook;
+module.exports = RoomBook;

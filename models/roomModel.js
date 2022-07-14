@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const reviewSchema = mongoose.Schema(
   {
@@ -10,6 +10,7 @@ const reviewSchema = mongoose.Schema(
       required: true,
       ref: "UserDetails",
     },
+    image: { type: String },
     replies: [
       {
         name: { type: String, required: true },
@@ -88,4 +89,4 @@ const roomSchema = mongoose.Schema(
 
 const Room = mongoose.model("Room", roomSchema);
 
-export default Room;
+module.exports = Room;

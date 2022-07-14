@@ -1,6 +1,6 @@
-import asyncHandler from "express-async-handler";
-import RoomBook from "../models/roomBookModel.js";
-import Room from "../models/roomModel.js";
+const asyncHandler = require("express-async-handler");
+const RoomBook = require("../models/roomBookModel.js");
+const Room = require("../models/roomModel.js");
 
 // @description   Book a room
 // @route         POST /api/booked/rooms
@@ -150,7 +150,7 @@ const deleteBookedRooms = asyncHandler(async (req, res) => {
   res.json({ message: "Booked Room Deleted" });
 });
 
-export {
+module.exports = {
   addBookRooms,
   getBookedRooms,
   getMyBookedRooms,

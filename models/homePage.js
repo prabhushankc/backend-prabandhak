@@ -1,19 +1,21 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const homePageSchema = mongoose.Schema({
+const homePageSchema = mongoose.Schema(
+  {
     selectedFile: { type: String },
     title: { type: String },
     detail: {
-        type: String
+      type: String,
     },
     description: {
-        type: String
+      type: String,
     },
-},
-    {
-        timestamps: true
-    });
+  },
+  {
+    timestamps: true,
+  }
+);
 
-const HomePage = mongoose.model('HomePage', homePageSchema);
+const HomePage = mongoose.model("HomePage", homePageSchema);
 
-export default HomePage;
+module.exports = HomePage;

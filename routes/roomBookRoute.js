@@ -1,7 +1,7 @@
-import express from "express";
+const express = require("express");
 const router = express.Router();
-import { auth, isAdmin } from "../middleware/auth.js";
-import {
+const { auth, isAdmin } = require("../middleware/auth.js");
+const {
   addBookRooms,
   deleteBookedRooms,
   getBookedRooms,
@@ -9,7 +9,7 @@ import {
   getBookedRoomById,
   updateRoomApproval,
   updateRoomPayment,
-} from "../controller/roomBookController.js";
+} = require("../controller/roomBookController.js");
 
 router
   .route("/:id")
@@ -21,4 +21,4 @@ router.route("/my/own").get(auth, getMyBookedRooms);
 router.route("/:id/approve").put(auth, isAdmin, updateRoomApproval);
 router.route("/:id/payment").put(auth, updateRoomPayment);
 
-export default router;
+module.exports = router;

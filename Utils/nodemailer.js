@@ -1,23 +1,23 @@
-import { createTransport } from "nodemailer";
+const { createTransport } = require("nodemailer");
 
-export const sendEmail = async (email, subject, text) => {
-    try {
-        const transporter = createTransport({
-            host: process.env.HOST,
-            service: process.env.SERVICE,
-            port: Number(process.env.EMAIL_PORT),
-            secure: Boolean(process.env.SECURE),
-            auth: {
-                user: process.env.USER,
-                pass: process.env.PASS,
-            },
-        });
-        await transporter.sendMail({
-            from: process.env.USER,
-            to: email,
-            subject: subject,
-            text: text,
-            html: `<div
+const sendEmail = async (email, subject, text) => {
+  try {
+    const transporter = createTransport({
+      host: process.env.HOST,
+      service: process.env.SERVICE,
+      port: Number(process.env.EMAIL_PORT),
+      secure: Boolean(process.env.SECURE),
+      auth: {
+        user: process.env.USER,
+        pass: process.env.PASS,
+      },
+    });
+    await transporter.sendMail({
+      from: process.env.USER,
+      to: email,
+      subject: subject,
+      text: text,
+      html: `<div
 			style="
 			  display: flex;
 			  justify-content: center;
@@ -38,8 +38,10 @@ export const sendEmail = async (email, subject, text) => {
 							<div variant="body1" style="text-align: center; letter-spacing: 2px; margin: 10px auto;">Thank you for choosing us</div>
 						</div>
 					</div>`,
-        });
-    } catch (error) {
-        return error;
-    }
+    });
+  } catch (error) {
+    return error;
+  }
 };
+
+module.exports = sendEmail;

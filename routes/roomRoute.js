@@ -1,5 +1,5 @@
-import { Router } from "express";
-import {
+const { Router } = require("express");
+const {
   createRoom,
   getRoomById,
   updateRoom,
@@ -9,9 +9,9 @@ import {
   createRoomReview,
   replyRoomReview,
   deleteRoomReview,
-} from "../controller/roomController.js";
+} = require("../controller/roomController.js");
 
-import { auth, isAdmin } from "../middleware/auth.js";
+const { auth, isAdmin } = require("../middleware/auth.js");
 
 const router = Router();
 
@@ -26,4 +26,4 @@ router.route("/:id/status").put(auth, updateRoomStatus);
 router.route("/:id/:review_id").delete(auth, deleteRoomReview);
 router.route("/:room_id/:review_id/reply").put(auth, isAdmin, replyRoomReview);
 
-export default router;
+module.exports = router;

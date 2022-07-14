@@ -1,35 +1,36 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const foodPageSchema = mongoose.Schema({
+const foodPageSchema = mongoose.Schema(
+  {
     selectedFile: { type: String },
     title: { type: String },
     description: {
-        type: String
+      type: String,
     },
     price: {
-        type: String
+      type: String,
     },
     tags: {
-        type: [String]
+      type: [String],
     },
     quantity: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     sold: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     comments: {
-        type: Array,
-        default: []
-    }
-},
-    {
-        timestamps: true
-    }
+      type: Array,
+      default: [],
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
-const foodPage = mongoose.model('foodPage', foodPageSchema);
+const foodPage = mongoose.model("foodPage", foodPageSchema);
 
-export default foodPage;
+module.exports = foodPage;

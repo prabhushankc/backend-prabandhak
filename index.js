@@ -1,17 +1,17 @@
-import express from "express";
-import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
-import roomRoutes from "./routes/roomRoute.js";
-import roomBookRoute from "./routes/roomBookRoute.js";
-import contactUs from "./routes/contactRoute.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
-import userRoutes from "./routes/users.js";
-import homePageRoutes from "./routes/homePage.js";
-import foodPageRoutes from "./routes/foodPage.js";
-import paymentRoutes from "./routes/payment.js";
-import morgan from "morgan";
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const roomRoutes = require("./routes/roomRoute.js");
+const roomBookRoute = require("./routes/roomBookRoute.js");
+const contactUs = require("./routes/contactRoute.js");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware.js");
+const userRoutes = require("./routes/users.js");
+const homePageRoutes = require("./routes/homePage.js");
+const foodPageRoutes = require("./routes/foodPage.js");
+const paymentRoutes = require("./routes/payment.js");
+const morgan = require("morgan");
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use("/foodPage", foodPageRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/booked/rooms", roomBookRoute);
-app.use("/api/contact/us", contactUs);
+app.use("/api/contact", contactUs);
 app.get("/", (req, res) => {
   res.send("Hello this is HMS");
 });
@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === "development") {
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6000;
 
 // mongoose
 //   .connect(process.env.CONNECTION_URL, {
@@ -51,6 +51,11 @@ const PORT = process.env.PORT || 5000;
 //   .catch(error => console.log(error));
 
 mongoose
-  .connect(process.env.Anup_Mongo_URL)
+  .connect(process.env.Anup_Mongo_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => app.listen(PORT, console.log(`Server running ${PORT}`)))
   .catch(error => console.log(error));
+
+module.exports = app;

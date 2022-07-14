@@ -1,5 +1,5 @@
-import asyncHandler from "express-async-handler";
-import Contact from "../models/contactModel.js";
+const asyncHandler = require("express-async-handler");
+const Contact = require("../models/contactModel.js");
 
 // @description   Contact admin
 // @route         POST /api/contact
@@ -18,6 +18,24 @@ const contactAdmin = asyncHandler(async (req, res) => {
   const contactData = await contact.save();
 
   res.status(201).json(contactData);
+});
+
+// @description   Update Contact List Approval
+// @route         PUT /api/contact/:id/resolve
+// @access        Admin/Private
+const updateContactStatus = asyncHandler(async (req, res) => {
+  const contactData = await Contact.findById(req.params.id);
+
+  if (!contactData) {
+    res.status(404);
+    throw new Error("No such booked rooms");
+  }
+
+  contactData.isResolved = !contactData.isResolved;
+
+  const updatedContact = await contactData.save();
+
+  res.json(updatedContact);
 });
 
 // @description   Get all contacts admin
@@ -49,4 +67,9 @@ const deleteContact = asyncHandler(async (req, res) => {
   res.json({ message: "Contact Deleted Successfully" });
 });
 
-export { contactAdmin, getAllContacts, deleteContact };
+module.exports = {
+  contactAdmin,
+  getAllContacts,
+  updateContactStatus,
+  deleteContact,
+};
