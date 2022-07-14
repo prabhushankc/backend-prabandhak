@@ -18,6 +18,10 @@ const userSchema = mongoose.Schema({
     cart: {
         type: Array,
         default: []
+    },
+    report: {
+        type: Array,
+        default: []
     }
 },
     {

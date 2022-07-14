@@ -9,7 +9,6 @@ import {
   deleteCommentFood,
 } from "../controller/foodPage.js";
 import { auth, checkAdmin } from "../middleware/auth.js";
-
 const router = express.Router();
 router.get("/", getFoodPage);
 router.get("/search", getFoodBySearch);
